@@ -92,7 +92,7 @@ class GameBoard extends Component {
 				y = board_high - card_high - y;
 			}
 
-			cards.push(<Card x={playground[i]['x']} y={y} key={playground[i]['id']} id={playground[i]['id']} card_id={playground[i]['card_id']} />);
+			cards.push(<Card x={playground[i]['x']} y={y} key={playground[i]['id']} id={playground[i]['id']} card_id={playground[i]['card_id']} is_standing={playground[i]['stand']}/>);
 		}
 
 		for(let i = 0; i < op_hands; i++){
@@ -321,9 +321,15 @@ class Card extends Component {
 
 	constructor(props) {
 		super(props);
+
+		// 生成横置状态
+		let standingCode = this.props.is_standing; // 1表示站着，0表示躺着
+		// 如果standingCode是undefined，则默认为1，isStanding=true
+		let isStanding = (standingCode != 0);
+
         this.state = {
             opacity: 1,
-            isStanding: true, // 默认都站着的
+            isStanding: isStanding,
         }
     }
 
@@ -427,13 +433,21 @@ class Card extends Component {
 			return;
 		};
 
-		// 重置isStanding状态
-		let isStanding = this.state.isStanding;
-		if (isStanding) {
-			this.setState({isStanding: false});
-		} else {
-			this.setState({isStanding: true});
-		}
+		let self = this;
+		$.post(
+			'/table/flip-card',
+			{id : self.props.id},
+			function(ret){
+				if (ret.code == 0) {
+					self.setStandingState(!self.state.isStanding);
+				};
+			},
+			'json'
+		);
+	}
+
+	setStandingState(isStanding) {
+		this.setState({isStanding: isStanding});
 	}
 }
 
