@@ -82,7 +82,7 @@ class GameBoard extends Component {
 		for(let i in hands){
 			let x = 20 + 110 * j;
 			let y = 580;
-			cards.push(<Card x={x} y={y} key={"hands" + hands[i]['id']} id={hands[i]['id']} card_id={hands[i]['card_id']} />);
+			cards.push(<Card x={x} y={y} key={"hands" + hands[i]['id']} id={hands[i]['id']} card_id={hands[i]['card_id']} is_in_hand={true}/>);
 			j++;
 		}
 
@@ -317,13 +317,13 @@ class GameBoard extends Component {
 }
 
 
-class Card extends Component{
-
+class Card extends Component {
 
 	constructor(props) {
 		super(props);
         this.state = {
             opacity: 1,
+            isStanding: true, // 默认都站着的
         }
     }
 
@@ -354,7 +354,7 @@ class Card extends Component{
 			}
 		}
 
-		if (isStanding != undefined && !isStanding) {
+		if (!isStanding) {
 			class_name = class_name + ' ' + LYING_DOWN_CLASS;
 		};
 
@@ -421,9 +421,15 @@ class Card extends Component{
 	}
 
 	handleDbClick() {
+		// 手牌不需要躺下来_(:з」∠)_
+		let isInHand = this.props.is_in_hand;
+		if (isInHand) {
+			return;
+		};
+
+		// 重置isStanding状态
 		let isStanding = this.state.isStanding;
-		console.log('onDoubleClick:' + isStanding)
-		if (isStanding == undefined || isStanding) {
+		if (isStanding) {
 			this.setState({isStanding: false});
 		} else {
 			this.setState({isStanding: true});
